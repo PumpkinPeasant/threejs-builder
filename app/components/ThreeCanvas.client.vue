@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { BufferGeometry} from "three";
+import type {BufferGeometry} from "three";
 import {
   BoxGeometry,
   DirectionalLight,
@@ -40,6 +40,10 @@ scene.add(light);
 
 function animate() {
   if (!renderer) return;
+  if (resizeRendererToDisplaySize(renderer) && canvasRef.value) {
+    camera.aspect = canvasRef.value.clientWidth / canvasRef.value.clientHeight;
+    camera.updateProjectionMatrix();
+  }
 
   meshes.forEach((mesh) => {
     mesh.rotation.x += 0.01;
@@ -61,12 +65,12 @@ onMounted(() => {
   camera.position.z = 5;
 
   renderer = new WebGLRenderer({canvas: canvasRef.value});
-  renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.setAnimationLoop(animate);
 });
 
 const changeMeshColor = (index: number, e: Event) => {
-  meshes[index]?.material.color.set(e?.target?.value)
+  const input = e.target as HTMLInputElement
+  meshes[index]?.material.color.set(input.value)
 }
 
 
@@ -85,6 +89,12 @@ const changeMeshColor = (index: number, e: Event) => {
 </template>
 
 <style>
+canvas {
+  width: 100vw;
+  height: 100vh;
+  display: block;
+}
+
 .controls {
   position: absolute;
 
